@@ -1,0 +1,143 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=<?php echo $cfg_soft_lang; ?>">
+    <title>EACPay设置</title>
+    <link rel="stylesheet" href="https://unpkg.com/layui@2.6.8/dist/css/layui.css">
+    <style>
+        .layui-form-label {
+            width: 150px;
+            padding: 9px 5px 9px 0;
+        }
+
+        .layui-input-block {
+            margin-left: 150px;
+        }
+
+        .layui-form-item .layui-input-inline {
+            width: 350px;
+        }
+    </style>
+</head>
+
+<body style="padding: 20px;">
+
+    <table class="layui-table" style="margin-top:8px">
+        <tr>
+            <td height="28" colspan="10" style="padding-left:10px;">
+                ◆ EACPay设置
+            </td>
+        </tr>
+    </table>
+    <form class="layui-form" action="" method="post">
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户提现</label>
+            <div class="layui-input-inline">
+                <input type="checkbox" name="allow_cash" lay-skin="switch" lay-text="开启|关闭" value="1" <?php
+                    if($csetting['allow_cash']=='1' ){echo 'checked' ;}?> />
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">提现比例</label>
+            <div class="layui-input-inline">
+                <input type="text" name="moneybl" required lay-verify="required" placeholder="根据自己的系统设置修改"
+                    autocomplete="off" class="layui-input" value="<?php echo $csetting['moneybl'];?>" />
+            </div>
+            <div class="layui-form-mid layui-word-aux">例子:填1表示1RMB=1金币,填10表示1RMB=10金币</div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">收款地址</label>
+            <div class="layui-input-inline">
+                <input type="text" name="recive_token" required lay-verify="required" placeholder="收款地址"
+                    autocomplete="off" class="layui-input" value="<?php echo $csetting['recive_token'];?>" />
+            </div>
+            <div class="layui-form-mid layui-word-aux">必填，请下载EAC钱包，生成一个地址，可以随时更换收款地址，严禁多个网站公用一个地址</div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">定价基准币种</label>
+            <div class="layui-input-inline">
+                <select name="bizhong" lay-verify="required">
+                    <option value="RMB" <?php if($csetting['bizhong']=='RMB' ){echo 'selected' ;}?>>人民币</option>
+                    <option value="USD" <?php if($csetting['bizhong']=='USD' ){echo 'selected' ;}?>>美元</option>
+                    <option value="EUR" <?php if($csetting['bizhong']=='EUR' ){echo 'selected' ;}?>>欧元</option>
+                </select>
+            </div>
+            <div class="layui-form-mid layui-word-aux">必选，系统自动将对应的金额数量换成成同等价值的eac个数</div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">Earthcoin区块链浏览器</label>
+            <div class="layui-input-inline">
+                <input type="text" name="eacpay_server" required lay-verify="required" placeholder="请不要随意修改"
+                    autocomplete="off" class="layui-input" value="<?php echo $csetting['eacpay_server'];?>" />
+            </div>
+            <div class="layui-form-mid layui-word-aux" style="margin-top: -10px;">必填，用于充值是到EAC区块链上查询支付情况，可以自行搭建或者查询公共浏览器<br/><a href="https://blocks.deveac.com:4040" target="_blank">https://blocks.deveac.com:4040</a>，<a href="https://api.eacpay.com:9000" target="_blank">https://api.eacpay.com:9000</a></div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">EAC定价基准交易所</label>
+            <div class="layui-input-inline">
+                <input type="text" name="exhangeapi" required lay-verify="required" placeholder="请不要随意修改"
+                    autocomplete="off" class="layui-input" value="<?php echo $csetting['exhangeapi'];?>" />
+            </div>
+            <div class="layui-form-mid layui-word-aux">必填，目前默认<a href="http://www.aex.com" target="_blank">http://www.aex.com(安银)</a></div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">确认数量</label>
+            <div class="layui-input-inline">
+                <input type="number" name="receiptConfirmation" required lay-verify="required" min="3" max="10" placeholder="默认3个"
+                    autocomplete="off" class="layui-input" value="<?php echo $csetting['receiptConfirmation'];?>" />
+            </div>
+            <div class="layui-form-mid layui-word-aux">必填，数值越大，确认充值的时间越长，但安全性越高，最低3个，建议不超过是10个</div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">支付超时</label>
+            <div class="layui-input-inline">
+                <input type="text" name="maxwaitpaytime" required lay-verify="required" placeholder="默认120分钟"
+                    autocomplete="off" class="layui-input" value="<?php echo $csetting['maxwaitpaytime'];?>" />
+            </div>
+            <div class="layui-form-mid layui-word-aux">单位:分钟</div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">提示信息</label>
+            <div class="layui-input-inline">
+                <textarea name="notice" placeholder="充值页面的提示信息"
+                    class="layui-textarea"><?php echo $csetting['notice'];?></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+
+</body>
+
+</html>
+
+<script src="https://unpkg.com/layui@2.6.8/dist/layui.js"></script>
+<script>
+    //Demo
+    layui.use('form', function () {
+        var form = layui.form;
+
+        var $ = layui.jquery;
+
+        //监听提交
+        form.on('submit(formDemo)', function (data) {
+            $.post('admin.php?dopost=settings', data.field, function (d) {
+                if (d == 'ok') {
+                    layui.layer.msg("操作成功", {
+                        icon: 1,
+                        time: 2000
+                    });
+                } else {
+                    layui.layer.msg(d, { icon: 2, time: 2000 })
+                }
+            });
+            return false;
+        });
+    });
+</script>

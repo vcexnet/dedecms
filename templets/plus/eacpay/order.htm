@@ -1,0 +1,107 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=<?php echo $cfg_soft_lang; ?>" />
+    <title>商城订单 - 会员中心 -
+        <?php echo $cfg_webname; ?>
+    </title>
+    <link href="templets/style/base.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="templets/js/j.js"></script>
+    <script type="text/javascript" src="templets/js/load.js"></script>
+    <script type="text/javascript" src="templets/js/leftmenu.js"></script>
+    <script type="text/javascript" src="templets/js/table_function.js"></script>
+    <script type="text/javascript">
+        //获得选中文件的文件名
+        function GetCheckfolderItem() {
+            var allSel = '';
+            if (document.form1.deleteid.value) return document.form1.deleteid.value;
+            for (i = 0; i < document.form1.deleteid.length; i++) {
+                if (document.form1.deleteid[i].checked) {
+                    if (allSel == '')
+                        allSel = document.form1.deleteid[i].value;
+                    else
+                        allSel = allSel + "," + document.form1.deleteid[i].value;
+                }
+            }
+            return allSel;
+        }
+
+        function DoSubmit() {
+            var selid = GetCheckfolderItem();
+            if (selid == '') {
+                alert("你没选中任何信息！");
+                return false;
+            }
+            if (window.confirm("你确定要删除这些消息么？")) {
+                location = "shops_orders.php?dopost=del&ids=" + selid;
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="/templets/plus/eacpay/pay.js"></script>
+</head>
+
+<body>
+    <div id="main">
+        <?php include(DEDEMEMBER."/templets/head.htm"); ?>
+        <div id="content" class="w960 clearfix">
+            <?php include(DEDEMEMBER."/templets/menu.php"); ?>
+            <table>
+                <tbody>
+                    <tr>
+                        <td width="180" class="td1">EAC即时价:</td>
+                        <td><strong id="exchangeData">
+                            <?php echo $getExchange;?>
+                            <?php echo $bizhongTxt;?>
+                            </strong></td>
+                    </tr>
+                    <tr>
+                        <td width="180" class="td1">约合EAC:</td>
+                        <td><strong id="exchangeData">
+                                <?php echo $eac;?>
+                            </strong></td>
+                    </tr>
+                    <tr>
+                        <td width="180" class="td1">扫描支付:</td>
+                        <td>
+                            <img src="<?php echo $cfg_cmspath;?>/plus/eacpay/home.php?dopost=qrcode&orderid=<?php echo $orderid;?>&eac=<?php echo $eac;?>" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                        </td>
+                        <td style="text-align:left;">
+                            <input type="submit" value="扫描完成,查看支付状态" id="ajaxgetresult" data-orderid="<?php echo $orderid;?>"
+                                style="width: auto;background-repeat: repeat-x;padding: 5px 10px;background: #ff5f00;border: 1px solid #b3a5a5;color: #fff;">
+                            <div id="eacpayresult" style="display: none;">
+                                <div class="resultmsg" style="text-align: center;font-size: 16px;margin-bottom: 15px;">正在确认订单，请稍等...</div>
+                                <div class="loading" style="width: 100%;height: 8px;background: #999999;border-radius: 2px;">
+                                    <div class="bar" style="width: 0%;background: #ff5f00;height: 100%;transition: all 0.2s;border-radius: 2px;"></div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                        </td>
+                        <td style="text-align:left;">
+                            <div class="eacpay_remark" style="position: absolute;top: 0;right: 0;background: #fff;padding: 10px;margin-top: 25px;">
+                            <p>人民币现金 1元 =
+                                <?php echo round(1 / $getExchange,4);?>个eac
+                            </p>
+                            <p>EACPAY手机端区块链钱包下载:</p>
+                            <p>1、google play</p>
+                            <p>2、eacpay.com官网下载</p>
+                            <p>3、手机浏览器扫一扫，下载EACPAY</p>
+                            <img src="/templets/plus/eacpay/app.jpg" width="160" height="190"/></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <?php include(DEDEMEMBER."/templets/foot.htm"); ?>
+    </div>
+</body>
+
+</html>

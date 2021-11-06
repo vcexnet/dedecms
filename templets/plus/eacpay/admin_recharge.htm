@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=<?php echo $cfg_soft_lang; ?>">
+    <title>文档管理</title>
+    <link rel="stylesheet" href="https://unpkg.com/layui@2.6.8/dist/css/layui.css">
+    <style>
+        .layui-form-label {
+            width: 50px;
+            padding: 9px 5px 9px 0;
+        }
+    </style>
+</head>
+
+<body style="padding: 20px;">
+
+
+    <!--  内容列表   -->
+    <form name="form2" class="layui-form">
+        <table class="layui-table" style="margin-top:8px">
+            <tr>
+                <td height="28" colspan="10" style="padding-left:10px;">
+                    ◆ 充值订单
+                </td>
+            </tr>
+            <tr height="25">
+                <td width="6%">用戶ID</td>
+                <td width="10%">用户名</td>
+                <td width="4%">订单号</td>
+                <td width="10%">创建时间</td>
+                <td width="8%">充值金额</td>
+                <td width="6%">等价EAC</td>
+                <td width="8%">实际到账</td>
+                <td width="8%">状态</td>
+            </tr>
+            {dede:datalist}
+            <tr>
+                <td>
+                    {dede:field.uid/}
+                </td>
+                <td>{dede:field.uname /}</td>
+                <td>
+                    {dede:field.order_id/}
+                </td>
+                <td>{dede:field.create_time function='date("Y-m-d H:i:s",@me)'/}</td>
+                <td>{dede:field.amount/}</td>
+                <td>{dede:field.eac/}</td>
+                <td>{dede:field.real_eac/}</td>
+                <td>
+                    <?php if ($fields['status'] == 'payed'){ ?>
+                    <a href="javascript:;" class="status{dede:field.status/}" data-status="{dede:field.status/}" data-orderid="{dede:field.order_id/}">
+                        需要手动处理
+                    </a>
+                    <?php }elseif($fields['status'] == 'wait'){ ?> 等待支付
+                    <?php }elseif($fields['status'] == 'cancel'){ ?> 取消
+                    <?php }else{ ?> 成功
+                    <?php } ?>
+                </td>
+            </tr>
+            {/dede:datalist}
+        <tr align="center">
+            <td height="36" colspan="10">
+                {dede:pagelist listsize=3/}
+            </td>
+        </tr>
+        </table>
+    </form>
+
+    <!--  搜索表单  -->
+    <form name='form3' action='content_list.php' method='get' class="layui-form">
+        <input type='hidden' name='dopost' value='listArchives' />
+        <table class="layui-table">
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td nowrap>
+                                订单号：
+                            </td>
+                            <td width='250'>
+                                <input type='text' name='keyword' class="layui-input" value='{dede:global.keyword/}' style='width:120px' />
+                            </td>
+                            <td width='90'>
+                                <select name='flag' style='width:80px'>
+                                    <option value=''>状态...</option>
+                                    <option value='wait' <?php if($flag=='wait'){echo 'selected';}?>>等待处理</option>
+                                    <option value='cancel' <?php if($flag=='cancel'){echo 'selected';}?>>取消</option>
+                                    <option value='complete' <?php if($flag=='complete'){echo 'selected';}?>>完成</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="layui-btn" type="button">查询</button>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+</body>
+
+</html>
+
+<script id="optinTpl" type="text/html">
+    <form action="" class="layui-form">
+        <input type="radio" name="statusSelect" value="complete" {{#  if(d.status == 'complete'){ }}checked{{#  } }}  title="支付完成">
+        <input type="radio" name="statusSelect" value="cancel" {{#  if(d.status == 'cancel'){ }}checked{{#  } }}  title="取消">
+    </form>
+</script>
+<script src="https://unpkg.com/layui@2.6.8/dist/layui.js"></script>
+<script>
+    var $ = layui.jquery;
+    $('.statuspayed').on('click', function() {
+        var that = $(this);
+        var s = $(this).data('status');
+        var order_id = $(this).data('orderid');
+        layui.layer.open({
+            title: '改变订单状态',
+            content: layui.laytpl($('#optinTpl').html()).render({
+                status: s
+            }),
+            success:function(){
+                layui.form.render('radio')
+            },
+            yes: function(index, layero) {
+                var checked = layero.find('input[name=statusSelect]:checked').val();
+                $.post('admin.php', {
+                        dopost: 'changestatus',
+                        status: checked,
+                        order_id: order_id,
+                    },
+                    function(d) {
+                        if (d == 'ok') {
+                            that.data('status', checked);
+                            layui.layer.msg("操作成功", {
+                                icon: 1,
+                                time: 2000
+                            }, function() {
+                                window.location.reload();
+                            });
+                        } else {
+                            layui.layer.msg(d,{icon:2,time:2000})
+                        }
+                    });
+            }
+        });
+    });
+    layui.laypage.render({
+        elem: 'pagenation',
+        count: '{$totalCount}',
+        limit: '{$pagesize}',
+        curr: '{$page}',
+        jump: function(obj, first) {
+            //obj包含了当前分页的所有参数，比如：
+            console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+            console.log(obj.limit); //得到每页显示的条数
+
+            //首次不执行
+            if (!first) {
+                var url = window.location.href;
+                url = url.replace(/&page=\d+/, '');
+                url += "&page=" + obj.curr;
+                window.location.href = url;
+            }
+        }
+    });
+</script>
